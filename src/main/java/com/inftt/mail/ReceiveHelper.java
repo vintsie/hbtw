@@ -1,7 +1,11 @@
 package com.inftt.mail;
 
 import javax.mail.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is the handler of receiving email, provides the normal functions
@@ -11,6 +15,8 @@ import java.util.Properties;
  * Created by Sam on 11/19/2014.
  */
 public abstract class ReceiveHelper {
+
+    private transient static Logger log = Logger.getLogger(ReceiveHelper.class.getName());
 
     /**
      * email address.
@@ -31,6 +37,8 @@ public abstract class ReceiveHelper {
     Session session = null;
     Store store = null;
 
+    List<Folder> openedFolder = new ArrayList<Folder>();
+
     boolean pulled = Boolean.FALSE;
 
     protected ReceiveHelper() {
@@ -43,10 +51,13 @@ public abstract class ReceiveHelper {
      * @throws NoSuchProviderException
      */
     protected void connect() throws MessagingException {
-        session = Session.getDefaultInstance(props, null);
-        store = session.getStore();
+        if (null == session)
+            session = Session.getDefaultInstance(props, null);
+        store = getStore();
         store.connect(username, password);
     }
+
+    protected abstract Store getStore() throws NoSuchProviderException;
 
     /**
      * reconnect to remote server to pull some email information.
@@ -80,11 +91,14 @@ public abstract class ReceiveHelper {
         this.password = password;
     }
 
-    public Folder getInbox() throws MessagingException {
+    public Folder getInbox(int mode) throws MessagingException {
         if (!pulled || !store.isConnected()) {
             connect();
         }
-        return store.getFolder(MailProtocolConst.FOLDER_INDEX);
+        Folder folder = store.getFolder(MailProtocolConst.FOLDER_INBOX);
+        folder.open(mode);
+        openedFolder.add(folder);
+        return folder;
     }
 
     /**
@@ -96,10 +110,33 @@ public abstract class ReceiveHelper {
      */
     public Folder getInbox(boolean reconnect) throws MessagingException {
         reconnect();
-        return store.getFolder(MailProtocolConst.FOLDER_INDEX);
+        return store.getFolder(MailProtocolConst.FOLDER_INBOX);
     }
 
-    public abstract Folder getFolder(String folderName) throws MessagingException;
+    /**
+     * close store and folder
+     *
+     * @throws MessagingException
+     */
+    public void close() {
+        try {
+            if (store != null && store.isConnected()) {
+                store.close();
+            }
+            for (Folder folder : openedFolder) {
+                if (folder.isOpen()) {
+                    folder.close(false);
+                }
+            }
+        } catch (MessagingException me) {
+            if (log.isLoggable(Level.WARNING)) {
+                log.warning("close session failed.");
+            }
+        }
+
+    }
+
+    public abstract Folder getFolder(String folderName, int mode) throws MessagingException;
 
     /**
      * Get email receiver instance, and should pass four parameters.
@@ -130,6 +167,13 @@ public abstract class ReceiveHelper {
      */
     public void setProperty(String key, Object value) {
         this.props.put(key, value);
+    }
+
+    public void setSessionDebug(boolean debug) {
+        if (null == session) {
+            session = Session.getDefaultInstance(props, null);
+        }
+        session.setDebug(debug);
     }
 
 }
