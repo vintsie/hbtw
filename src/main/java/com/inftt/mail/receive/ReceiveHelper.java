@@ -1,6 +1,7 @@
 package com.inftt.mail.receive;
 
 import javax.mail.*;
+import javax.mail.internet.MimeMessage;
 import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -45,21 +46,14 @@ public class ReceiveHelper {
             int unreadMsgCount = inbox.getUnreadMessageCount();
             if (log.isLoggable(Level.INFO)) {
                 log.info("message count " + msgCount);
-                //log.info(inbox.);
                 log.info("unread message count " + unreadMsgCount);
             }
             Message[] messages = inbox.getMessages(1, msgCount);
-            //Message[] allMsgs = inbox.getMessages();
-            //System.out.println(allMsgs.length);
             if (null != messages && messages.length > 0) {
                 int i = 1;
                 for (Message message : messages) {
-                    //if(log.isLoggable(Level.INFO)) {
-                    System.out.println((i++) + "\t" + message.getSubject() + "\t" + new Timestamp(message.getSentDate().getTime()));
-                    message.setFlag(Flags.Flag.SEEN, true);
-                    //message.
-                    //System.out.println(message.);
-                    //}
+                    MimeMessage mMsg = (MimeMessage) message;
+                    System.out.println(mMsg.getMessageID() + "\t" + mMsg.getSubject() + "\t" + new Timestamp(mMsg.getSentDate().getTime()));
                 }
             }
         } catch (Exception e1) {

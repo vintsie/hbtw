@@ -23,7 +23,10 @@ public class MailTest {
             rh.setSessionDebug(true);
             Folder index = rh.getInbox(Folder.READ_ONLY);
             System.out.println(index.getMessageCount());
+            System.out.println(index.getUnreadMessageCount());
         } catch (MessagingException me) {
+            me.printStackTrace(System.out);
+        } finally {
             rh.close();
         }
 
