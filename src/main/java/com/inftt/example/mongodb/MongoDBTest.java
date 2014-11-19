@@ -1,5 +1,6 @@
 package com.inftt.example.mongodb;
 
+import com.inftt.db.mongodb.MongoDBClient;
 import com.mongodb.*;
 import org.junit.Test;
 
@@ -19,7 +20,8 @@ public class MongoDBTest {
      */
     public static void main(String[] args) throws Exception {
         //Thread.sleep(2000);
-        DBCollection dbc = MongoDBInstance.getMongoDB(MDB_N.CLOUD1).getCollection("testData");
+        DB db = MongoDBClient.get(MDB_N.CLOUD1);
+        DBCollection dbc = db.getCollection("testData");
         dbc.drop();
         //DBCursor cursor = dbc.find();
         //while (cursor.hasNext()) {
