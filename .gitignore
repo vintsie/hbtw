@@ -1,2 +1,4 @@
 .idea/
- hbtw.iml
+
+/target
+hbtw.iml
