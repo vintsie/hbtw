@@ -25,10 +25,10 @@ public class MongoDBTest {
         dbc.drop();
         //DBCursor cursor = dbc.find();
         //while (cursor.hasNext()) {
-            //DBObject object = cursor.next();
-            //String objectId = String.valueOf(object.get("_id"));
-            //dbc.remove(object);
-            //System.out.println("Object [" + objectId + "] removed.");
+        //DBObject object = cursor.next();
+        //String objectId = String.valueOf(object.get("_id"));
+        //dbc.remove(object);
+        //System.out.println("Object [" + objectId + "] removed.");
         //}
         //DBObject object = new BasicDBObject();
         //object.put("dept_id", "D90021");
@@ -50,7 +50,7 @@ public class MongoDBTest {
     }
 
     @Test
-    public void testModifyDBObject() throws Exception{
+    public void testModifyDBObject() throws Exception {
         //DBCursor cursor = MongoDBInstance.getMongoDB(MDB_N.CLOUD1)
         //        .getCollection("purchase_list").find(new BasicDBObject("title", "Purchase Order 1"));
 
