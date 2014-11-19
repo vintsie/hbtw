@@ -3,9 +3,10 @@ package com.inftt.mail;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Store;
 
 /**
- *
  * Created by Vin on 11/19/2014.
  */
 public class Pop3Handler extends ReceiveHelper {
@@ -19,10 +20,15 @@ public class Pop3Handler extends ReceiveHelper {
     }
 
     @Override
-    public Folder getFolder(String folderName) throws MessagingException {
-        if (!MailProtocolConst.FOLDER_INDEX.equals(folderName)) {
+    public Folder getFolder(String folderName, int mode) throws MessagingException {
+        if (!MailProtocolConst.FOLDER_INBOX.equals(folderName)) {
             throw new UnsupportedOperationException();
         }
-        return getInbox();
+        return getInbox(mode);
+    }
+
+    @Override
+    protected Store getStore() throws NoSuchProviderException {
+        return session.getStore("pop3");
     }
 }

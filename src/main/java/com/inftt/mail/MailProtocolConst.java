@@ -1,7 +1,6 @@
 package com.inftt.mail;
 
 /**
- *
  * Created by Sam on 11/19/2014.
  */
 public class MailProtocolConst {
@@ -18,5 +17,5 @@ public class MailProtocolConst {
         public final static String IS_SSL = "mail.imap.ssl.enable";
     }
 
-    public final static String FOLDER_INDEX = "INDEX";
+    public final static String FOLDER_INBOX = "INBOX";
 }
