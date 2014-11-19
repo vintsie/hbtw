@@ -3,12 +3,16 @@ package com.inftt.mail.receive;
 import javax.mail.*;
 import java.sql.Timestamp;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * receive email helper.
  * Created by Vin on 2014/11/19.
  */
 public class ReceiveHelper {
+    private transient static Logger log = Logger.getLogger(ReceiveHelper.class.getName());
+
     public static void main(String[] args) {
         Store store = null;
 
@@ -36,12 +40,26 @@ public class ReceiveHelper {
 
             // get folder
             inbox = store.getFolder("INBOX");
-            inbox.open(Folder.READ_ONLY);
-            Message[] messages = inbox.getMessages(1, 36);
+            inbox.open(Folder.READ_WRITE);
+            int msgCount = inbox.getMessageCount();
+            int unreadMsgCount = inbox.getUnreadMessageCount();
+            if (log.isLoggable(Level.INFO)) {
+                log.info("message count " + msgCount);
+                //log.info(inbox.);
+                log.info("unread message count " + unreadMsgCount);
+            }
+            Message[] messages = inbox.getMessages(1, msgCount);
+            //Message[] allMsgs = inbox.getMessages();
+            //System.out.println(allMsgs.length);
             if (null != messages && messages.length > 0) {
                 int i = 1;
                 for (Message message : messages) {
+                    //if(log.isLoggable(Level.INFO)) {
                     System.out.println((i++) + "\t" + message.getSubject() + "\t" + new Timestamp(message.getSentDate().getTime()));
+                    message.setFlag(Flags.Flag.SEEN, true);
+                    //message.
+                    //System.out.println(message.);
+                    //}
                 }
             }
         } catch (Exception e1) {

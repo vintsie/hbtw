@@ -2,7 +2,7 @@ package com.inftt.example.mongodb;
 
 /**
  * Mongo database names
- *
+ * <p/>
  * Created by Vin on 2014/10/14.
  */
 public class MDB_N {

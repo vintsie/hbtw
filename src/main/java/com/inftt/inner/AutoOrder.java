@@ -11,16 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  自动订餐
+ * 自动订餐
  * Created by Vin on 2014/9/30.
  */
 public class AutoOrder {
 
     /**
-     *
      * @param args arguments
      */
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
         //Content returnContent =
         //        Request.Get("http://10.11.32.148:81/super/NJSupper.php").execute().returnContent();
@@ -37,8 +36,8 @@ public class AutoOrder {
                 .execute().returnContent();
         String contentString = returnContent.asString();
         String result = "";
-        if(contentString.startsWith(
-                "﻿<script>alert('取消订餐失败, 请检查您输入的工号, 姓名.已经超过可以取消订餐的时间!');</script>")){
+        if (contentString.startsWith(
+                "﻿<script>alert('取消订餐失败, 请检查您输入的工号, 姓名.已经超过可以取消订餐的时间!');</script>")) {
 
         }
     }
