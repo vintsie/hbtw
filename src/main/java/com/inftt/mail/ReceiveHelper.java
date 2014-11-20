@@ -1,9 +1,7 @@
 package com.inftt.mail;
 
 import javax.mail.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,12 +35,15 @@ public abstract class ReceiveHelper {
     Session session = null;
     Store store = null;
 
-    List<Folder> openedFolder = new ArrayList<Folder>();
+    Map<String, Folder> openedFolder = new HashMap<String, Folder>();
+    /**
+     * mail folder operation mode.
+     */
+    int folderOpMode = Folder.READ_ONLY;
 
     boolean pulled = Boolean.FALSE;
 
     protected ReceiveHelper() {
-
     }
 
     /**
@@ -91,13 +92,20 @@ public abstract class ReceiveHelper {
         this.password = password;
     }
 
+    /**
+     * Open inbox folder with the specified open mode.
+     *
+     * @param mode open mode.
+     * @return Folder
+     * @throws MessagingException
+     */
     public Folder getInbox(int mode) throws MessagingException {
         if (!pulled || !store.isConnected()) {
             connect();
         }
         Folder folder = store.getFolder(MailProtocolConst.FOLDER_INBOX);
         folder.open(mode);
-        openedFolder.add(folder);
+        openedFolder.put(MailProtocolConst.FOLDER_INBOX, folder);
         return folder;
     }
 
@@ -108,24 +116,23 @@ public abstract class ReceiveHelper {
      * @return Index folder
      * @throws MessagingException
      */
-    public Folder getInbox(boolean reconnect) throws MessagingException {
-        reconnect();
-        return store.getFolder(MailProtocolConst.FOLDER_INBOX);
+    public Folder getInbox(boolean reconnect, int mode) throws MessagingException {
+        if (reconnect)
+            reconnect();
+        return getInbox(mode);
     }
 
     /**
      * close store and folder
-     *
-     * @throws MessagingException
      */
     public void close() {
         try {
             if (store != null && store.isConnected()) {
                 store.close();
             }
-            for (Folder folder : openedFolder) {
-                if (folder.isOpen()) {
-                    folder.close(false);
+            for (Map.Entry<String, Folder> entry : openedFolder.entrySet()) {
+                if (entry.getValue().isOpen()) {
+                    entry.getValue().close(false);
                 }
             }
         } catch (MessagingException me) {
@@ -136,7 +143,37 @@ public abstract class ReceiveHelper {
 
     }
 
-    public abstract Folder getFolder(String folderName, int mode) throws MessagingException;
+    /**
+     * Open mail folder by folder name and open-mode
+     *
+     * @param folderName mail box folder name
+     * @return mail box folder
+     * @throws MessagingException
+     */
+    public Folder getFolder(String folderName) throws MessagingException {
+        if (!pulled || !store.isConnected()) {
+            connect();
+        }
+        Folder folder = store.getFolder(folderName);
+        folder.open(folderOpMode);
+        openedFolder.put(folderName, folder);
+        return folder;
+    }
+
+    /**
+     * Get Message count by folder name.
+     *
+     * @param folderName mail box folder name
+     * @return message count
+     * @throws MessagingException
+     */
+    public int getMessageCount(String folderName) throws MessagingException {
+        Folder folder = openedFolder.get(folderName);
+        if (null == folder || !folder.isOpen()) {
+            folder = getFolder(folderName);
+        }
+        return folder.getMessageCount();
+    }
 
     /**
      * Get email receiver instance, and should pass four parameters.
@@ -157,6 +194,19 @@ public abstract class ReceiveHelper {
         ReceiveHelper rh = new Pop3Handler();
         rh.initProps(host, port, isSSL, userName, password);
         return rh;
+    }
+
+    /**
+     * set mail folder operation mode, currently read_only and read_write
+     * are supported.
+     *
+     * @param opMode operation mode
+     */
+    public void setMailOpMode(int opMode) {
+        if (Folder.READ_ONLY == opMode || Folder.READ_WRITE == opMode)
+            this.folderOpMode = opMode;
+        else
+            throw new UnsupportedOperationException("unknown folder operation mode " + opMode);
     }
 
     /**

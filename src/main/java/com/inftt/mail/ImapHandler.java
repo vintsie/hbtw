@@ -1,11 +1,11 @@
 package com.inftt.mail;
 
-import javax.mail.Folder;
-import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Store;
 
 /**
+ * Imap protocol mail handler.
+ * <p/>
  * Created by Vin on 11/19/2014.
  */
 public class ImapHandler extends ReceiveHelper {
@@ -16,16 +16,6 @@ public class ImapHandler extends ReceiveHelper {
         setProperty(MailProtocolConst.IMAP.HOST, host);
         setProperty(MailProtocolConst.IMAP.PORT, port);
         setProperty(MailProtocolConst.IMAP.IS_SSL, isSSL);
-    }
-
-    @Override
-    public Folder getFolder(String folderName, int mode) throws MessagingException {
-        if (!pulled || !store.isConnected()) {
-            connect();
-        }
-        Folder folder = store.getFolder(folderName);
-        folder.open(mode);
-        return folder;
     }
 
 
