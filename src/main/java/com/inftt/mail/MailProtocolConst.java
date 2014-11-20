@@ -1,6 +1,8 @@
 package com.inftt.mail;
 
 /**
+ * Static information of mail protocol.
+ * <p/>
  * Created by Sam on 11/19/2014.
  */
 public class MailProtocolConst {

@@ -1,9 +1,9 @@
 package com.inftt;
 
+import com.inftt.mail.MailProtocolConst;
 import com.inftt.mail.ReceiveHelper;
 import org.junit.Test;
 
-import javax.mail.Folder;
 import javax.mail.MessagingException;
 
 /**
@@ -21,9 +21,12 @@ public class MailTest {
         ReceiveHelper rh = ReceiveHelper.newPopInstance(popHost, "995", true, username, password);
         try{
             rh.setSessionDebug(true);
-            Folder index = rh.getInbox(Folder.READ_ONLY);
-            System.out.println(index.getMessageCount());
-            System.out.println(index.getUnreadMessageCount());
+            System.out.println(rh.getMessageCount(MailProtocolConst.FOLDER_INBOX));
+            //Folder index = rh.getInbox(Folder.READ_ONLY);
+
+
+            //System.out.println(index.getMessageCount());
+            //System.out.println(index.getUnreadMessageCount());
         } catch (MessagingException me) {
             me.printStackTrace(System.out);
         } finally {
