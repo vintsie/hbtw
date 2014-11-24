@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public class GlobalExePool {
 
-    transient static Logger log = Logger.getLogger("1123");
+    transient static Logger log = Logger.getLogger(GlobalExePool.class.getName());
 
     /**
      * This is the core thread pool. key stands for the executor name, so base on this
