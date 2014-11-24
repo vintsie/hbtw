@@ -9,7 +9,7 @@ import javax.mail.Store;
 /**
  * POP3 protocol mail handler.
  * <p/>
- * Created by Vin on 11/19/2014.
+ * Created by Sam on 11/19/2014.
  */
 public class Pop3Handler extends ReceiveHelper {
 
@@ -73,7 +73,7 @@ public class Pop3Handler extends ReceiveHelper {
      */
     @Override
     public void setMailOpMode(int opMode) {
-        if(Folder.READ_ONLY == opMode)
+        if (Folder.READ_ONLY == opMode)
             super.setMailOpMode(opMode);
         else
             throw new UnsupportedOperationException("Pop3 protocol only support read_only mode.");

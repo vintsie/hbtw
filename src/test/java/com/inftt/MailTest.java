@@ -11,7 +11,7 @@ import javax.mail.internet.MimeMessage;
 
 /**
  * Mail Testing
- * Created by Vin on 11/19/2014.
+ * Created by Sam on 11/19/2014.
  */
 public class MailTest {
 
@@ -23,15 +23,15 @@ public class MailTest {
     @Test
     public void testPopReceive() {
         ReceiveHelper rh = ReceiveHelper.newPopInstance(popHost, "995", true, username, password);
-        try{
+        try {
             rh.setSessionDebug(true);
             int msgCount = rh.getMessageCount(MailProtocolConst.FOLDER_INBOX);
             //System.out.println(rh.getMessageCount("111"));
             //Folder index = rh.getInbox(Folder.READ_ONLY);
             Folder inbox = rh.getFolder(MailProtocolConst.FOLDER_INBOX);
             Message[] messages = inbox.getMessages(1, msgCount);
-            if(null != messages && messages.length > 0) {
-                for(Message message : messages) {
+            if (null != messages && messages.length > 0) {
+                for (Message message : messages) {
                     MimeMessage mMsg = (MimeMessage) message;
                     System.out.println(mMsg.getMessageID() + "|" + mMsg.getSubject());
                 }
