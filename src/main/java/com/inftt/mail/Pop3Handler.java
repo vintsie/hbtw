@@ -13,6 +13,15 @@ import javax.mail.Store;
  */
 public class Pop3Handler extends ReceiveHelper {
 
+    /**
+     * Initial pop3 protocol properties.
+     *
+     * @param host     mail server host
+     * @param port     mail server port
+     * @param isSSL    use ssl connection or not
+     * @param username email address
+     * @param password the pass code used to log on mail server.
+     */
     @Override
     protected void initProps(String host, String port, boolean isSSL, String username, String password) {
         initialUserInfo(username, password);
@@ -21,6 +30,14 @@ public class Pop3Handler extends ReceiveHelper {
         setProperty(MailProtocolConst.POP3.IS_SSL, isSSL);
     }
 
+    /**
+     * Open mail folder. Only inbox folder can be requested to open while
+     * using Pop3 protocol.
+     *
+     * @param folderName mail box folder name
+     * @return Mail Folder, under this protocol means inbox.
+     * @throws MessagingException
+     */
     @Override
     public Folder getFolder(String folderName) throws MessagingException {
         if (!MailProtocolConst.FOLDER_INBOX.equals(folderName)) {
