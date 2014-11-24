@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public abstract class ReceiveHelper {
 
-    private transient static Logger log = Logger.getLogger(ReceiveHelper.class.getName());
+    private transient static Logger log = Logger.getLogger(ReceiveHelper.class.getSimpleName());
 
     /**
      * email address.

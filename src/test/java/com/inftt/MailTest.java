@@ -4,9 +4,7 @@ import com.inftt.mail.MailProtocolConst;
 import com.inftt.mail.ReceiveHelper;
 import org.junit.Test;
 
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 
 /**
@@ -56,9 +54,46 @@ public class MailTest {
                 for (Message message : messages) {
                     MimeMessage mMsg = (MimeMessage) message;
                     System.out.println(mMsg.getMessageID() + "|" + mMsg.getSubject());
+                    if ("<AXBTYWWUW$UXUZAXUYAZXZT@mail-out.est.act-on.net>".equals(mMsg.getMessageID())) {
+                        if (mMsg.getContentType().startsWith("multipart")) {
+                            Multipart mp = (Multipart) mMsg.getContent();
+                            int count = mp.getCount();
+                            for (int i = 0; i < count; i++) {
+                                BodyPart bp = mp.getBodyPart(i);
+                                System.out.println(bp.getContentType());
+                                System.out.println(bp.getContent().toString());
+                            }
+                        }
+                    }
+//                    String contentType = mMsg.getContentType();
+//                    if(contentType.startsWith("TEXT")) {
+//                        //System.out.println(mMsg.getContent().toString());
+//                    }
+//                    if(contentType.startsWith("multipart")) {
+//                        Multipart mp = (Multipart)mMsg.getContent();
+//                        int count = mp.getCount();
+//                        if(count > 0){
+//                            BodyPart bp = mp.getBodyPart(count);
+//                            //bp.
+//                        }
+//                    }
+                    //System.out.println(mMsg.getContentType());
+
+
+/*                    BufferedInputStream bis = new BufferedInputStream(mMsg.getInputStream());
+                    ByteArrayOutputStream localBuffer = new ByteArrayOutputStream();
+
+                    byte[] temp = new byte[20480];
+                    int count;
+                    while ((count = bis.read(temp)) != -1) {
+                        localBuffer.write(temp, 0, count);
+                    }
+                    System.out.println("++++:" + new String(localBuffer.toByteArray()));
+                    bis.close();
+                    localBuffer.close();*/
                 }
             }
-        } catch (MessagingException me) {
+        } catch (Exception me) {
             me.printStackTrace(System.out);
         } finally {
             rh.close();
