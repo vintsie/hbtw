@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * 自动订餐
- * Created by Vin on 2014/9/30.
+ * Created by Sam on 2014/9/30.
  */
 public class AutoOrder {
 

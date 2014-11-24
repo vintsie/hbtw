@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * Study how to use MongodbClient
  * <p/>
- * Created by Vin on 2014/10/14.
+ * Created by Sam on 2014/10/14.
  */
 public class MongoDBTest {
 

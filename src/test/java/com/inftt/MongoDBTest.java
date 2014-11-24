@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 /**
  * Mongo Database Testing
- * Created by Vin on 2014/11/21.
+ * Created by Sam on 2014/11/21.
  */
 public class MongoDBTest {
 
@@ -27,9 +27,9 @@ public class MongoDBTest {
     public void testMongoDBClient() throws Exception {
         DB cloud1 = MongoDBClient.get(MDB_N.CLOUD1);
         Set<String> allCols = cloud1.getCollectionNames();
-        if(null != allCols && allCols.size() > 0) {
-            for(String colName : allCols) {
-                if(colName.startsWith("system."))
+        if (null != allCols && allCols.size() > 0) {
+            for (String colName : allCols) {
+                if (colName.startsWith("system."))
                     continue;
                 DBCollection dbc = cloud1.getCollection(colName);
                 log.log(Level.WARNING, "${0} will be removed.", new Object[]{dbc.getFullName()});
@@ -37,7 +37,6 @@ public class MongoDBTest {
             }
         }
     }
-
 
 
 }

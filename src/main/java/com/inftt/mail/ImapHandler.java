@@ -6,7 +6,7 @@ import javax.mail.Store;
 /**
  * Imap protocol mail handler.
  * <p/>
- * Created by Vin on 11/19/2014.
+ * Created by Sam on 11/19/2014.
  */
 public class ImapHandler extends ReceiveHelper {
 
