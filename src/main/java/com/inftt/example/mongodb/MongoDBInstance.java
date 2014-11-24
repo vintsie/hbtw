@@ -21,9 +21,8 @@ public class MongoDBInstance {
     public final static String HOST = "127.0.0.1";
     public final static int PORT = 27017;
 
-    public static MongoClient _mc;
-
-    public static String[][] credentialMatrix = new String[][]{
+    static MongoClient _mc = null;
+    final static String[][] credentialMatrix = new String[][]{
             {"mgex", "cloud_0x0001", "mgex"},
             {"mgex", "cloud_0x0002", "mgex"}
     };
