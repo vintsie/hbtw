@@ -99,7 +99,9 @@ public class GlobalExePool {
     }
 
     /**
-     * shutdown the thread pool executor.
+     * shutdown the thread pool executor. If current executor pool contains unhandled command,
+     * then try to sleep 2 seconds, after that retry to shutdown the executor. This kind of circle
+     * process will not stop util the executor is shutdown successfully.
      *
      * @param poolId pool flag, as well as pool name.
      */
