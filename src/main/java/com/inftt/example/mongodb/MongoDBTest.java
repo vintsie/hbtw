@@ -1,5 +1,6 @@
 package com.inftt.example.mongodb;
 
+import com.inftt.db.mongodb.MDB_N;
 import com.inftt.db.mongodb.MongoDBClient;
 import com.mongodb.*;
 import org.junit.Test;

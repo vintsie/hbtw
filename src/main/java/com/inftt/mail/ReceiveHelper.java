@@ -41,8 +41,6 @@ public abstract class ReceiveHelper {
      */
     int folderOpMode = Folder.READ_ONLY;
 
-    boolean pulled = Boolean.FALSE;
-
     protected ReceiveHelper() {
     }
 
@@ -54,8 +52,20 @@ public abstract class ReceiveHelper {
     protected void connect() throws MessagingException {
         if (null == session)
             session = Session.getDefaultInstance(props, null);
-        store = getStore();
+        if (null == store)
+            store = getStore();
         store.connect(username, password);
+    }
+
+    /**
+     * Check mail server store is connected or not.
+     *
+     * @return if local store is connecting to remote server, return
+     * true, or return false.
+     * @throws MessagingException
+     */
+    protected boolean isConnected() throws MessagingException {
+        return null != session && null != store && store.isConnected();
     }
 
     protected abstract Store getStore() throws NoSuchProviderException;
@@ -69,12 +79,16 @@ public abstract class ReceiveHelper {
         if (null == store) store = session.getStore();
         if (store.isConnected()) {
             store.close();
+
         }
         store.connect(username, password);
     }
 
     /**
+     * Initial mail server properties.
+     *
      * @param host     mail server host
+     * @param port     mail server port
      * @param isSSL    use ssl connection or not
      * @param username email address
      * @param password the pass code used to log on mail server.
@@ -99,15 +113,15 @@ public abstract class ReceiveHelper {
      * @return Folder
      * @throws MessagingException
      */
-    public Folder getInbox(int mode) throws MessagingException {
-        if (!pulled || !store.isConnected()) {
-            connect();
-        }
-        Folder folder = store.getFolder(MailProtocolConst.FOLDER_INBOX);
-        folder.open(mode);
-        openedFolder.put(MailProtocolConst.FOLDER_INBOX, folder);
-        return folder;
-    }
+//    public Folder getInbox(int mode) throws MessagingException {
+//        if (!pulled || !store.isConnected()) {
+//            connect();
+//        }
+//        Folder folder = store.getFolder(MailProtocolConst.FOLDER_INBOX);
+//        folder.open(mode);
+//        openedFolder.put(MailProtocolConst.FOLDER_INBOX, folder);
+//        return folder;
+//    }
 
     /**
      * reconnect to remote server to pull information
@@ -116,11 +130,11 @@ public abstract class ReceiveHelper {
      * @return Index folder
      * @throws MessagingException
      */
-    public Folder getInbox(boolean reconnect, int mode) throws MessagingException {
-        if (reconnect)
-            reconnect();
-        return getInbox(mode);
-    }
+//    public Folder getInbox(boolean reconnect, int mode) throws MessagingException {
+//        if (reconnect)
+//            reconnect();
+//        return getInbox(mode);
+//    }
 
     /**
      * close store and folder
@@ -151,7 +165,10 @@ public abstract class ReceiveHelper {
      * @throws MessagingException
      */
     public Folder getFolder(String folderName) throws MessagingException {
-        if (!pulled || !store.isConnected()) {
+        if (openedFolder.containsKey(folderName)) {
+            return openedFolder.get(folderName);
+        }
+        if (null == store || !store.isConnected()) {
             connect();
         }
         Folder folder = store.getFolder(folderName);
@@ -173,6 +190,18 @@ public abstract class ReceiveHelper {
             folder = getFolder(folderName);
         }
         return folder.getMessageCount();
+    }
+
+    /**
+     * get namespaces of local store which is mapping to remote server.
+     *
+     * @return namespaces of local store which is mapping to remote server.
+     * @throws MessagingException
+     */
+    public Folder[] getPersonalNamespaces() throws MessagingException {
+        if (!isConnected())
+            connect();
+        return store.getPersonalNamespaces();
     }
 
     /**

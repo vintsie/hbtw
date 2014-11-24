@@ -1,4 +1,4 @@
-package com.inftt.example.mongodb;
+package com.inftt.db.mongodb;
 
 /**
  * Mongo database names
