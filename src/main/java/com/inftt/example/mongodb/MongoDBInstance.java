@@ -7,23 +7,21 @@ import com.mongodb.ServerAddress;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Mongodb client singleton.
  * <p/>
- * Created by Vin on 2014/10/14.
+ * Created by Sam on 2014/10/14.
  */
 public class MongoDBInstance {
 
-    static Logger logger = Logger.getLogger(MongoDBInstance.class.getName());
+    //static Logger logger = Logger.getLogger(MongoDBInstance.class.getName());
 
     public final static String HOST = "127.0.0.1";
     public final static int PORT = 27017;
 
-    public static MongoClient _mc;
-
-    public static String[][] credentialMatrix = new String[][]{
+    static MongoClient _mc = null;
+    final static String[][] credentialMatrix = new String[][]{
             {"mgex", "cloud_0x0001", "mgex"},
             {"mgex", "cloud_0x0002", "mgex"}
     };

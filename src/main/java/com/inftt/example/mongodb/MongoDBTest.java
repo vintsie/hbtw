@@ -1,5 +1,6 @@
 package com.inftt.example.mongodb;
 
+import com.inftt.db.mongodb.MDB_N;
 import com.inftt.db.mongodb.MongoDBClient;
 import com.mongodb.*;
 import org.junit.Test;
@@ -8,7 +9,7 @@ import org.junit.Test;
 /**
  * Study how to use MongodbClient
  * <p/>
- * Created by Vin on 2014/10/14.
+ * Created by Sam on 2014/10/14.
  */
 public class MongoDBTest {
 

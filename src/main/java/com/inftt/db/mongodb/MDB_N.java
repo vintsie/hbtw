@@ -1,9 +1,9 @@
-package com.inftt.example.mongodb;
+package com.inftt.db.mongodb;
 
 /**
  * Mongo database names
  * <p/>
- * Created by Vin on 2014/10/14.
+ * Created by Sam on 2014/10/14.
  */
 public class MDB_N {
 

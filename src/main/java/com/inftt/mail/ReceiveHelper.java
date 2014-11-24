@@ -1,8 +1,8 @@
 package com.inftt.mail;
 
 import javax.mail.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public abstract class ReceiveHelper {
 
-    private transient static Logger log = Logger.getLogger(ReceiveHelper.class.getName());
+    private transient static Logger log = Logger.getLogger(ReceiveHelper.class.getSimpleName());
 
     /**
      * email address.
@@ -37,12 +37,13 @@ public abstract class ReceiveHelper {
     Session session = null;
     Store store = null;
 
-    List<Folder> openedFolder = new ArrayList<Folder>();
-
-    boolean pulled = Boolean.FALSE;
+    Map<String, Folder> openedFolder = new HashMap<String, Folder>();
+    /**
+     * mail folder operation mode.
+     */
+    int folderOpMode = Folder.READ_ONLY;
 
     protected ReceiveHelper() {
-
     }
 
     /**
@@ -53,8 +54,20 @@ public abstract class ReceiveHelper {
     protected void connect() throws MessagingException {
         if (null == session)
             session = Session.getDefaultInstance(props, null);
-        store = getStore();
+        if (null == store)
+            store = getStore();
         store.connect(username, password);
+    }
+
+    /**
+     * Check mail server store is connected or not.
+     *
+     * @return if local store is connecting to remote server, return
+     * true, or return false.
+     * @throws MessagingException
+     */
+    protected boolean isConnected() throws MessagingException {
+        return null != session && null != store && store.isConnected();
     }
 
     protected abstract Store getStore() throws NoSuchProviderException;
@@ -68,12 +81,16 @@ public abstract class ReceiveHelper {
         if (null == store) store = session.getStore();
         if (store.isConnected()) {
             store.close();
+
         }
         store.connect(username, password);
     }
 
     /**
+     * Initial mail server properties.
+     *
      * @param host     mail server host
+     * @param port     mail server port
      * @param isSSL    use ssl connection or not
      * @param username email address
      * @param password the pass code used to log on mail server.
@@ -91,15 +108,22 @@ public abstract class ReceiveHelper {
         this.password = password;
     }
 
-    public Folder getInbox(int mode) throws MessagingException {
-        if (!pulled || !store.isConnected()) {
-            connect();
-        }
-        Folder folder = store.getFolder(MailProtocolConst.FOLDER_INBOX);
-        folder.open(mode);
-        openedFolder.add(folder);
-        return folder;
-    }
+    /**
+     * Open inbox folder with the specified open mode.
+     *
+     * @param mode open mode.
+     * @return Folder
+     * @throws MessagingException
+     */
+//    public Folder getInbox(int mode) throws MessagingException {
+//        if (!pulled || !store.isConnected()) {
+//            connect();
+//        }
+//        Folder folder = store.getFolder(MailProtocolConst.FOLDER_INBOX);
+//        folder.open(mode);
+//        openedFolder.put(MailProtocolConst.FOLDER_INBOX, folder);
+//        return folder;
+//    }
 
     /**
      * reconnect to remote server to pull information
@@ -108,24 +132,23 @@ public abstract class ReceiveHelper {
      * @return Index folder
      * @throws MessagingException
      */
-    public Folder getInbox(boolean reconnect) throws MessagingException {
-        reconnect();
-        return store.getFolder(MailProtocolConst.FOLDER_INBOX);
-    }
+//    public Folder getInbox(boolean reconnect, int mode) throws MessagingException {
+//        if (reconnect)
+//            reconnect();
+//        return getInbox(mode);
+//    }
 
     /**
      * close store and folder
-     *
-     * @throws MessagingException
      */
     public void close() {
         try {
             if (store != null && store.isConnected()) {
                 store.close();
             }
-            for (Folder folder : openedFolder) {
-                if (folder.isOpen()) {
-                    folder.close(false);
+            for (Map.Entry<String, Folder> entry : openedFolder.entrySet()) {
+                if (entry.getValue().isOpen()) {
+                    entry.getValue().close(false);
                 }
             }
         } catch (MessagingException me) {
@@ -136,7 +159,52 @@ public abstract class ReceiveHelper {
 
     }
 
-    public abstract Folder getFolder(String folderName, int mode) throws MessagingException;
+    /**
+     * Open mail folder by folder name and open-mode
+     *
+     * @param folderName mail box folder name
+     * @return mail box folder
+     * @throws MessagingException
+     */
+    public Folder getFolder(String folderName) throws MessagingException {
+        if (openedFolder.containsKey(folderName)) {
+            return openedFolder.get(folderName);
+        }
+        if (null == store || !store.isConnected()) {
+            connect();
+        }
+        Folder folder = store.getFolder(folderName);
+        folder.open(folderOpMode);
+        openedFolder.put(folderName, folder);
+        return folder;
+    }
+
+    /**
+     * Get Message count by folder name.
+     *
+     * @param folderName mail box folder name
+     * @return message count
+     * @throws MessagingException
+     */
+    public int getMessageCount(String folderName) throws MessagingException {
+        Folder folder = openedFolder.get(folderName);
+        if (null == folder || !folder.isOpen()) {
+            folder = getFolder(folderName);
+        }
+        return folder.getMessageCount();
+    }
+
+    /**
+     * get namespaces of local store which is mapping to remote server.
+     *
+     * @return namespaces of local store which is mapping to remote server.
+     * @throws MessagingException
+     */
+    public Folder[] getPersonalNamespaces() throws MessagingException {
+        if (!isConnected())
+            connect();
+        return store.getPersonalNamespaces();
+    }
 
     /**
      * Get email receiver instance, and should pass four parameters.
@@ -157,6 +225,19 @@ public abstract class ReceiveHelper {
         ReceiveHelper rh = new Pop3Handler();
         rh.initProps(host, port, isSSL, userName, password);
         return rh;
+    }
+
+    /**
+     * set mail folder operation mode, currently read_only and read_write
+     * are supported.
+     *
+     * @param opMode operation mode
+     */
+    public void setMailOpMode(int opMode) {
+        if (Folder.READ_ONLY == opMode || Folder.READ_WRITE == opMode)
+            this.folderOpMode = opMode;
+        else
+            throw new UnsupportedOperationException("unknown folder operation mode " + opMode);
     }
 
     /**
