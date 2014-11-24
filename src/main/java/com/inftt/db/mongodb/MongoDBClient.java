@@ -18,7 +18,7 @@ public class MongoDBClient {
     public final static String HOST = "127.0.0.1";
     public final static int PORT = 27017;
 
-    public static String[][] credentialMatrix = new String[][]{
+    final static String[][] credentialMatrix = new String[][]{
             {"mgex", "cloud_0x0001", "mgex"},
             {"mgex", "cloud_0x0002", "mgex"}
     };
