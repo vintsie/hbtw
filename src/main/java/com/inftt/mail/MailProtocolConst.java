@@ -17,7 +17,10 @@ public class MailProtocolConst {
         public final static String HOST = "mail.imap.host";
         public final static String PORT = "mail.imap.port";
         public final static String IS_SSL = "mail.imap.ssl.enable";
+        public final static String PASSWORD = "password";
+        public final static String USERNAME = "username";
     }
 
     public final static String FOLDER_INBOX = "INBOX";
+    public final static String FOLDER_COMMAND = "Command";
 }

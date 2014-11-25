@@ -16,7 +16,15 @@ public class MailTest {
     String popHost = "pop.qq.com";
     String imapHost = "imap.qq.com";
     String username = "vin.is.coding@qq.com";
-    String password = "caiwm@2013";
+    String password = "";
+
+    String yeahImapHost = "imap.163.com";
+    String yeahUserName = "sam_iagd@yeah.net";
+    String yeahPassword = "";
+
+    String liveImapHost = "imap-mail.outlook.com";
+    String liveUserName  = "sam.iagd@hotmail.com";
+    String livePassword = "";
 
     @Test
     public void testPopReceive() {
@@ -45,9 +53,15 @@ public class MailTest {
     public void testImapReceive() {
         ReceiveHelper rh = ReceiveHelper.newImapInstance(imapHost, "993", true, username, password);
         try {
-            rh.setSessionDebug(false);
+            rh.setSessionDebug(true);
             rh.setMailOpMode(Folder.READ_WRITE);
-            Folder inbox = rh.getFolder(MailProtocolConst.FOLDER_INBOX);
+            //Folder[] ns = rh.getNameSpaces(username);
+            //System.out.println(ns.length);
+            //Folder[] folders = rh.getPersonalNamespaces();
+            //System.out.println(folders.length);
+            //folders[0].open(Folder.READ_ONLY);
+            //System.out.println(folders[0].getMessageCount());
+            Folder inbox = rh.getFolder(MailProtocolConst.FOLDER_COMMAND);
             int msgCount = inbox.getMessageCount();
             Message[] messages = inbox.getMessages(1, msgCount);
             if (null != messages && messages.length > 0) {

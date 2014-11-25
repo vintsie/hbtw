@@ -1,5 +1,7 @@
 package com.inftt.mail;
 
+import com.sun.mail.imap.protocol.Namespaces;
+
 import javax.mail.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,7 @@ public abstract class ReceiveHelper {
      * Some information relevant to email receiving will be
      * put into this props.
      */
-    private Properties props = new Properties();
+    Properties props = new Properties();
 
     Session session = null;
     Store store = null;
@@ -194,6 +196,11 @@ public abstract class ReceiveHelper {
         return folder.getMessageCount();
     }
 
+
+    public Folder[] getNameSpaces(String username) throws MessagingException{
+        return null;
+    }
+
     /**
      * get namespaces of local store which is mapping to remote server.
      *
@@ -207,7 +214,7 @@ public abstract class ReceiveHelper {
     }
 
     /**
-     * Get email receiver instance, and should pass four parameters.
+     * Get imap email receiver instance, and should pass five parameters.
      *
      * @param host     mail server host
      * @param isSSL    use ssl connection or not
@@ -221,6 +228,16 @@ public abstract class ReceiveHelper {
         return rh;
     }
 
+    /**
+     * Get pop3 email receiver instance, and should pass five parameters.
+     *
+     * @param host     mail server host
+     * @param port     remote mail server connection port
+     * @param isSSL    use ssl connection or not
+     * @param userName email address.
+     * @param password the pass code used to log on mail server.
+     * @return ReceiveHelper implemented using pop3 protocol.
+     */
     public static ReceiveHelper newPopInstance(String host, String port, boolean isSSL, String userName, String password) {
         ReceiveHelper rh = new Pop3Handler();
         rh.initProps(host, port, isSSL, userName, password);
