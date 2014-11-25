@@ -1,12 +1,15 @@
 package com.inftt;
 
+import com.inftt.framework.GlobalExePool;
 import com.inftt.mail.MailProtocolConst;
 import com.inftt.mail.ReceiveHelper;
+import com.inftt.runnable.UnreadCommandDownloader;
 import org.junit.Test;
 
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Mail Testing
@@ -34,8 +37,6 @@ public class MailTest {
         try {
             rh.setSessionDebug(true);
             int msgCount = rh.getMessageCount(MailProtocolConst.FOLDER_INBOX);
-            //System.out.println(rh.getMessageCount("111"));
-            //Folder index = rh.getInbox(Folder.READ_ONLY);
             Folder inbox = rh.getFolder(MailProtocolConst.FOLDER_INBOX);
             Message[] messages = inbox.getMessages(1, msgCount);
             if (null != messages && messages.length > 0) {
@@ -71,7 +72,6 @@ public class MailTest {
             Folder inbox = rh.getFolder(cFolderName);
             int msgCount = inbox.getUnreadMessageCount();
             Message[] messages = inbox.getMessages(1, msgCount);
-            //Message[] messages =
             if (null != messages && messages.length > 0) {
                 for (Message message : messages) {
                     MimeMessage mMsg = (MimeMessage) message;
@@ -87,5 +87,16 @@ public class MailTest {
         }
     }
 
+
+    @Test
+    public void testMailPullRunnableJob() throws Exception {
+        GlobalExePool.createOnePool("m1", 5, 200, 60, TimeUnit.SECONDS);
+        for (int i = 0; i < 1; i++) {
+            Runnable runnable = new UnreadCommandDownloader(qqImapHost, "imap", 993, qqUsername, qqPassword);
+            GlobalExePool.executeCommand("m1", runnable);
+        }
+        Thread.sleep(30000);
+        GlobalExePool.shutdown("m1");
+    }
 
 }

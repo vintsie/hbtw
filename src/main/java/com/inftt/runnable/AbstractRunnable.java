@@ -14,36 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.inftt.mail;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.inftt.runnable;
 
 /**
- * Mail Exception
- * Created by Sam on 11/19/2014.
+ * Additional used method should be implemented in local runnable class.
+ * Created by Sam on 2014/11/25.
+ *
+ * @author Sam Iagd
+ * @see java.lang.Runnable
  */
-public class MailException extends Exception {
-
-    public final static String ERR_CODE = "E9800";
-
-    private final static Map<String, String> ERR_DETAIL = new HashMap<String, String>() {
-        {
-            put(ERR_CODE, "Email receive error.");
-        }
-    };
+public abstract class AbstractRunnable implements Runnable {
 
     /**
-     * throw multi-lang exception, will be supported in thr future.
+     * Set thread information.
      *
-     * @param errCode exception code.
-     * @throws Exception
+     * @param info thread information
      */
-    public MailException(String errCode) throws Exception {
-        if (ERR_DETAIL.containsKey(errCode)) {
-            throw new Exception(errCode + ":" + ERR_DETAIL.get(errCode));
-        } else {
-            throw new Exception(errCode);
-        }
+    public void setThreadInfo(String info) {
+        Thread.currentThread().setName(info);
     }
 }
