@@ -1,11 +1,8 @@
 package com.inftt.mail;
 
-import com.sun.mail.imap.protocol.Namespaces;
 
 import javax.mail.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +37,11 @@ public abstract class ReceiveHelper {
     Store store = null;
 
     Map<String, Folder> openedFolder = new HashMap<String, Folder>();
+
+    /**
+     * List all folders of server mail.
+     */
+    Map<String, Set<String>> remoteFL = new HashMap<String, Set<String>>();
     /**
      * mail folder operation mode.
      */
@@ -59,6 +61,7 @@ public abstract class ReceiveHelper {
         if (null == store)
             store = getStore();
         store.connect(username, password);
+        listFolders("*");
     }
 
     /**
@@ -111,34 +114,16 @@ public abstract class ReceiveHelper {
     }
 
     /**
-     * Open inbox folder with the specified open mode.
+     * Check connection, if the connection of remote mail server has not been
+     * established, call connect()
      *
-     * @param mode open mode.
-     * @return Folder
      * @throws MessagingException
      */
-//    public Folder getInbox(int mode) throws MessagingException {
-//        if (!pulled || !store.isConnected()) {
-//            connect();
-//        }
-//        Folder folder = store.getFolder(MailProtocolConst.FOLDER_INBOX);
-//        folder.open(mode);
-//        openedFolder.put(MailProtocolConst.FOLDER_INBOX, folder);
-//        return folder;
-//    }
-
-    /**
-     * reconnect to remote server to pull information
-     *
-     * @param reconnect connect remote server to pull new information
-     * @return Index folder
-     * @throws MessagingException
-     */
-//    public Folder getInbox(boolean reconnect, int mode) throws MessagingException {
-//        if (reconnect)
-//            reconnect();
-//        return getInbox(mode);
-//    }
+    void checkConnection() throws MessagingException {
+        if (!isConnected()) {
+            connect();
+        }
+    }
 
     /**
      * close store and folder
@@ -159,6 +144,17 @@ public abstract class ReceiveHelper {
             }
         }
 
+    }
+
+    /**
+     * Get default folder.
+     *
+     * @return The default folder
+     * @throws MessagingException
+     */
+    public Folder getDefaultFolder() throws MessagingException {
+        checkConnection();
+        return store.getDefaultFolder();
     }
 
     /**
@@ -197,7 +193,14 @@ public abstract class ReceiveHelper {
     }
 
 
-    public Folder[] getNameSpaces(String username) throws MessagingException{
+    /**
+     * Get user namespace.
+     *
+     * @param username username
+     * @return Folders under user namespace
+     * @throws MessagingException
+     */
+    public Folder[] getNameSpaces(String username) throws MessagingException {
         return null;
     }
 
@@ -208,9 +211,33 @@ public abstract class ReceiveHelper {
      * @throws MessagingException
      */
     public Folder[] getPersonalNamespaces() throws MessagingException {
-        if (!isConnected())
-            connect();
+        checkConnection();
         return store.getPersonalNamespaces();
+    }
+
+    /**
+     * List all folders and store the folders to local instance cache using
+     * param pattern as key.
+     *
+     * @param pattern list pattern, * or %
+     * @return all folders name
+     * @throws MessagingException
+     */
+    public Set<String> listFolders(String pattern) throws MessagingException {
+        checkConnection();
+        if (remoteFL.containsKey(pattern)) {
+            return remoteFL.get(pattern);
+        }
+        Folder folder = store.getDefaultFolder();
+        Folder[] allFolders = folder.list(pattern);
+        Set<String> folderList = new HashSet<String>();
+        if (null != allFolders && allFolders.length > 0) {
+            for (Folder af : allFolders) {
+                folderList.add(af.getFullName());
+            }
+            remoteFL.put(pattern, folderList);
+        }
+        return folderList;
     }
 
     /**

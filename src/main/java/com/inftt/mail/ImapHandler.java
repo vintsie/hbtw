@@ -11,14 +11,19 @@ import javax.mail.*;
  */
 public class ImapHandler extends ReceiveHelper {
 
+    /**
+     * Get folders under user namespace,
+     * override from {@link com.inftt.mail.ReceiveHelper#getNameSpaces(String)}
+     *
+     * @param username username
+     * @return Folders under user namespace.
+     * @throws MessagingException
+     */
     @Override
-    public Folder[] getNameSpaces(String username) throws MessagingException{
-        if(!isConnected()) {
+    public Folder[] getNameSpaces(String username) throws MessagingException {
+        if (!isConnected()) {
             connect();
         }
-        Folder[] folders = store.getSharedNamespaces();
-        System.out.println(folders);
-
         return store.getUserNamespaces(username);
     }
 
