@@ -69,12 +69,15 @@ public class MailTest {
             }
 
             Folder inbox = rh.getFolder(cFolderName);
-            int msgCount = inbox.getMessageCount();
+            int msgCount = inbox.getUnreadMessageCount();
             Message[] messages = inbox.getMessages(1, msgCount);
+            //Message[] messages =
             if (null != messages && messages.length > 0) {
                 for (Message message : messages) {
                     MimeMessage mMsg = (MimeMessage) message;
                     System.out.println(mMsg.getMessageID() + "|" + mMsg.getSubject());
+                    System.out.println(mMsg.getContentType());
+                    System.out.println(mMsg.getContent().getClass().getName());
                 }
             }
         } catch (Exception me) {
