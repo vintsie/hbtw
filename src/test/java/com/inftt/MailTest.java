@@ -1,13 +1,15 @@
 package com.inftt;
 
+import com.inftt.dao.CommonDataAccess;
 import com.inftt.framework.GlobalExePool;
-import com.inftt.mail.MailProtocolConst;
 import com.inftt.mail.ReceiveHelper;
 import com.inftt.runnable.UnreadCommandDownloader;
+import org.apache.commons.collections4.MapUtils;
 import org.junit.Test;
 
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -16,47 +18,23 @@ import java.util.concurrent.TimeUnit;
  * Created by Sam on 11/19/2014.
  */
 public class MailTest {
-
-    //todo remove the password.
-    String qqHost = "pop.qq.com";
-    String qqImapHost = "imap.qq.com";
     String qqUsername = "vin.is.coding@qq.com";
-    String qqPassword = "";
 
-    String yeahImapHost = "imap.163.com";
-    String yeahUserName = "sam_iagd@yeah.net";
-    String yeahPassword = "";
-
-    String liveImapHost = "imap-mail.outlook.com";
-    String liveUserName  = "sam.iagd@hotmail.com";
-    String livePassword = "";
-
-    @Test
-    public void testPopReceive() {
-        ReceiveHelper rh = ReceiveHelper.newPopInstance(qqHost, "995", true, qqUsername, qqPassword);
-        try {
-            rh.setSessionDebug(true);
-            int msgCount = rh.getMessageCount(MailProtocolConst.FOLDER_INBOX);
-            Folder inbox = rh.getFolder(MailProtocolConst.FOLDER_INBOX);
-            Message[] messages = inbox.getMessages(1, msgCount);
-            if (null != messages && messages.length > 0) {
-                for (Message message : messages) {
-                    MimeMessage mMsg = (MimeMessage) message;
-                    System.out.println(mMsg.getMessageID() + "|" + mMsg.getSubject());
-                }
-            }
-        } catch (MessagingException me) {
-            me.printStackTrace(System.out);
-        } finally {
-            rh.close();
-        }
-    }
 
     @Test
     public void testImapReceive() {
+
         //ReceiveHelper rh = ReceiveHelper.newImapInstance(liveImapHost, "993", true, liveUserName, livePassword);
-        ReceiveHelper rh = ReceiveHelper.newImapInstance(qqImapHost, "993", true, qqUsername, qqPassword);
+        ReceiveHelper rh = null;
         try {
+            Map<String, Object> mailInfo = CommonDataAccess.getEmailInfo(qqUsername, "imap");
+            rh = ReceiveHelper.newImapInstance(
+                    MapUtils.getString(mailInfo, "host"),
+                    MapUtils.getString(mailInfo, "port"),
+                    MapUtils.getBoolean(mailInfo, "isSSL"),
+                    MapUtils.getString(mailInfo, "mail"),
+                    MapUtils.getString(mailInfo, "password"));
+
             rh.setSessionDebug(false);
             rh.setMailOpMode(Folder.READ_WRITE);
 
@@ -83,6 +61,7 @@ public class MailTest {
         } catch (Exception me) {
             me.printStackTrace(System.out);
         } finally {
+            if(null != rh)
             rh.close();
         }
     }
@@ -91,9 +70,13 @@ public class MailTest {
     @Test
     public void testMailPullRunnableJob() throws Exception {
         GlobalExePool.createOnePool("m1", 5, 200, 60, TimeUnit.SECONDS);
-        for (int i = 0; i < 1; i++) {
-            Runnable runnable = new UnreadCommandDownloader(qqImapHost, "imap", 993, qqUsername, qqPassword);
+        Map<String, Object> mailInfo = CommonDataAccess.getEmailInfo(qqUsername, "imap");
+        for (int i = 0; i < 10; i++) {
+            Runnable runnable = new UnreadCommandDownloader(MapUtils.getString(mailInfo, "host"), "imap", 993,
+                    MapUtils.getString(mailInfo, "mail"),
+                    MapUtils.getString(mailInfo, "password"));
             GlobalExePool.executeCommand("m1", runnable);
+            Thread.sleep(20000);
         }
         Thread.sleep(30000);
         GlobalExePool.shutdown("m1");
